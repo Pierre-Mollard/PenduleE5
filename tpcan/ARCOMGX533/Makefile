@@ -1,7 +1,7 @@
-obj-m	   := squelette_tp2.o
+obj-m	   := 3718.o
 
 PATH := /opt/x86_64/gcc/gcc-3.4.4/bin:$(PATH)
-KIT = arcom6.lan.esiee.fr
+KIT = arcom20.lan.esiee.fr
 CURRENT = 2.6.16.14-arcom1
 KDIR = /usr/lib/arcom/lib/modules/${CURRENT}/build
 PWD = $(shell pwd)
