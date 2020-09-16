@@ -25,7 +25,17 @@ MODULE_LICENSE("GPL");
 #define REG_RANGE BASE+1
 #define REG_MUX BASE+2
 #define REG_PACER BASE+10
+
 int sel_channel = 0;
+
+static RT_TASK acq;
+
+void acq_task(int id){
+  ADRangeSelect(1, 8);
+  u16 value = ReadAD();
+ 
+  printk("Resultat : %u", value);
+}
 
 int init3718(void){
   outb(REG_CTRL, 0);
@@ -53,14 +63,16 @@ u16 ReadAD(void){
   if(pret == 48){//16 pour software (INT) 7 pour EOC
 	printk("-Debut conversion\n");
 	int channelLu = inb(BASE) && 15;
-	printk("-Channel conversion : %d\n", channelLu);
+	printk("-Channel conversion : %u\n", channelLu);
 	if(channelLu == sel_channel){ //15 : masque pour les 4 lowbyte
 		printk("-Channel valide\n");
     		int lowbyte = inb(BASE)>>4;
-		printk("-lowbyte : %d\n", lowbyte);
+		printk("-lowbyte : %u\n", lowbyte);
     		int highbyte = inb(REG_RANGE);
-		printk("-highbyte : %d\n", highbyte);
-    		return lowbyte + highbyte<<4;
+		printk("-highbyte : %u\n", highbyte);
+		u16 resultat = lowbyte;
+		resultat = resultat + (highbyte<<4);
+    		return resultat;
   	}else{
 		printk("-Channel non valide (ignore)\n");
 	}
@@ -75,21 +87,24 @@ static int tpcan_init(void) {
 
   int ierr;
   RTIME now;
+  init3718();
+
+  //taches
+  rt_set_oneshot_mode();
+  ierr = rt_task_init(&acq, acq_task, 0, STACK_SIZE, PRIORITE, 0, 0);
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
+  rt_task_make_periodic(&acq, now, nano2count(PERIODE_CONTROL));
  
-  init3718();
-  ADRangeSelect(0, 0);
-  u8 value = ReadAD();
- 
-  printk("test 2 : %d", value);
+  printk("Init\n");
  
  return(0);
 }
 
 static void tpcan_exit(void) {
  stop_rt_timer(); 
+ rt_task_delete(&acq);
 
 }
 
