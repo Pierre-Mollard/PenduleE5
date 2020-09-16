@@ -31,29 +31,29 @@ int sel_channel = 0;
 static RT_TASK acq;
 
 int init3718(void){
-  outb(REG_CTRL, 0);
-  outb(REG_PACER, 1);
+  outb(0, REG_CTRL);
+  outb(1, REG_PACER);
 
 }
 
 void SetChanel(int in_channel){
   sel_channel = in_channel;
   printk("Definition channel : %d\n", in_channel);
-  outb(REG_MUX, in_channel + in_channel<<4); // à verif (p27)
+  outb(in_channel + in_channel<<4, REG_MUX); // à verif (p27)
 }
 
 void ADRangeSelect(int channel, int range){
   SetChanel(channel);
-  outb(REG_RANGE, range); //Range code (p26) à définir
+  outb(range, REG_RANGE); //Range code (p26) à définir
   printk("Definition range : %d\n", range);
 }
 
 u16 ReadAD(void){
   printk("-Debut read\n");
-  outb(BASE, 1);//trigger conversion
+  outb(1, BASE);//trigger conversion
   int pret = inb(REG_STATUS);
   printk("-Status : %d\n", pret);
-  if(pret == 48){//16 pour software (INT) 7 pour EOC
+  if(pret == 48){//48 pour EOC et Int = 1, Mask : 16 pour software (INT) 7 pour EOC
 	printk("-Debut conversion\n");
 	int channelLu = inb(BASE) && 15;
 	printk("-Channel conversion : %u\n", channelLu);
@@ -81,7 +81,7 @@ void acq_task(int id){
   	ADRangeSelect(1, 8);
   	u16 value = ReadAD();
  
-  	printk("Resultat : %u", value);
+  	printk("Resultat : %u\n", value);
   	rt_task_wait_period();
   }
 }
