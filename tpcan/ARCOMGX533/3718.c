@@ -30,13 +30,6 @@ int sel_channel = 0;
 
 static RT_TASK acq;
 
-void acq_task(int id){
-  ADRangeSelect(1, 8);
-  u16 value = ReadAD();
- 
-  printk("Resultat : %u", value);
-}
-
 int init3718(void){
   outb(REG_CTRL, 0);
   outb(REG_PACER, 1);
@@ -82,6 +75,17 @@ u16 ReadAD(void){
   }
   
 }
+
+void acq_task(int id){
+  while(1){
+  	ADRangeSelect(1, 8);
+  	u16 value = ReadAD();
+ 
+  	printk("Resultat : %u", value);
+  	rt_task_wait_period();
+  }
+}
+
 
 static int tpcan_init(void) {
 
