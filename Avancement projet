@@ -1,0 +1,19 @@
+Semaine 1 :
+
+RTAI :
+- Compréhension de comment on met du code et comment on l'execute sur la carte ARCOM ( make, make send ( id : arcom, mdp arcom ), ./runarcom Nom_Du_Module, dmesg
+- Création module RTAI pour la carte acquisition ADC 3718
+	- int init3718(void)
+	- void SetChanel(int in_channel)
+	- void ADRangeSelect(int channel, int range)
+	- u16 ReadAD(void)
+
+	- Premièrement sans les interruptions ( explication du code ) 
+		- Difficultées : - Comprendre le fonctionnement de la carte avec simplement la doc, 
+				 - Déterminer ce qu'il faut initialiser
+				 - Sortie en u16 et pas u8
+		- Résultat : - Si en entrée on met +-10V, on a des valeurs dans dmesg compris en 0 et 4095 proportionel au voltage
+
+MATLAB :
+- Simulation du fonctionnement du pendule avec TrueTime
+
