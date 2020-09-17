@@ -7,8 +7,6 @@
 #include <rtai_sched.h>
 #include <rtai_fifos.h>
 
-#include"3712.h"
-
 MODULE_LICENSE("GPL");
 
 /* define pour tache periodique */
@@ -39,12 +37,12 @@ int init3718(void){
 void SetChanel(int in_channel){
   sel_channel = in_channel;
   printk("Definition channel : %d\n", in_channel);
-  outb(in_channel + in_channel<<4, REG_MUX); // à verif (p27)
+  outb(in_channel + in_channel<<4, REG_MUX); // Ã  verif (p27)
 }
 
 void ADRangeSelect(int channel, int range){
   SetChanel(channel);
-  outb(range, REG_RANGE); //Range code (p26) à définir
+  outb(range, REG_RANGE); //Range code (p26) Ã  dÃ©finir
   printk("Definition range : %d\n", range);
 }
 
