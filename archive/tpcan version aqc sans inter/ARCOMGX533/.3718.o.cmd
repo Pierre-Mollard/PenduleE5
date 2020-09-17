@@ -382,6 +382,7 @@ deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o := \
     $(wildcard include/config/vt.h) \
   /usr/lib/arcom/realtime/include/rtai_sched.h \
   /usr/lib/arcom/realtime/include/rtai_fifos.h \
+  /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3712.h \
 
 /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o: $(deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o)
 

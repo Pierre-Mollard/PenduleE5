@@ -1,0 +1,1 @@
+cmd_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_adc.ko := ld -m elf_i386 -m elf_i386 -r -o /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_adc.ko /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_adc.o /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_adc.mod.o

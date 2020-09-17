@@ -26,8 +26,6 @@ MODULE_LICENSE("GPL");
 
 int sel_channel = 0;
 
-static RT_TASK acq;
-
 int init3718(void){
   outb(0, REG_CTRL);
   outb(1, REG_PACER);
@@ -74,17 +72,6 @@ u16 ReadAD(void){
   
 }
 
-void acq_task(int id){
-  while(1){
-  	ADRangeSelect(1, 8);
-  	u16 value = ReadAD();
- 
-  	printk("Resultat : %u\n", value);
-  	rt_task_wait_period();
-  }
-}
-
-
 static int tpcan_init(void) {
 
   int ierr;
@@ -93,23 +80,24 @@ static int tpcan_init(void) {
 
   //taches
   rt_set_oneshot_mode();
-  ierr = rt_task_init(&acq, acq_task, 0, STACK_SIZE, PRIORITE, 0, 0);
+  
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
-  rt_task_make_periodic(&acq, now, nano2count(PERIODE_CONTROL));
- 
-  printk("Init\n");
+
+  printk("Init Module Entree\n");
  
  return(0);
 }
 
 static void tpcan_exit(void) {
  stop_rt_timer(); 
- rt_task_delete(&acq);
 
 }
 
 module_init(tpcan_init);
 module_exit(tpcan_exit);
 
+EXPORT_SYMBOL(SetChanel);
+EXPORT_SYMBOL(ADRangeSelect);
+EXPORT_SYMBOL(ReadAD);

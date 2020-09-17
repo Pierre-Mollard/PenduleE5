@@ -10,9 +10,6 @@ read junk
 sudo insmod /usr/realtime/modules/rtai_hal.ko
 sudo insmod /usr/realtime/modules/rtai_sched.ko
 sudo insmod 3712.ko
-sudo insmod module_Entree.ko
-sudo insmod module_Sortie.ko
-sudo insmod module_TestES.ko
 sudo insmod $1.ko
 
 lsmod
@@ -21,9 +18,6 @@ echo "Tapez <return> pour l'arreter."
 read junk
 
 sudo rmmod $1
-sudo rmmod module_TestES
-sudo rmmod module_Sortie
-sudo rmmod module_Entree
 sudo rmmod 3712
 sudo rmmod rtai_sched
 sudo rmmod rtai_hal

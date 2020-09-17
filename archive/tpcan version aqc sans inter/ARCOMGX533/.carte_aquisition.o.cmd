@@ -1,7 +1,7 @@
-cmd_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o :=  gcc -m32 -Wp,-MD,/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/.3718.o.d  -nostdinc -isystem /opt/x86_64/gcc/gcc-3.4.4/lib/gcc/x86_64-gnu-linux/3.4.4/include -D__KERNEL__ -Iinclude  -include include/linux/autoconf.h -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -ffreestanding -Os     -fomit-frame-pointer -pipe -msoft-float -mpreferred-stack-boundary=2 -fno-unit-at-a-time  -Iinclude/asm-i386/mach-default -Wdeclaration-after-statement  -I/usr/lib/arcom/realtime/include -Wall -ffast-math -mhard-float  -DMODULE -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(3718)"  -D"KBUILD_MODNAME=KBUILD_STR(3718)" -c -o /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.c
+cmd_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/carte_aquisition.o :=  gcc -m32 -Wp,-MD,/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/.carte_aquisition.o.d  -nostdinc -isystem /opt/x86_64/gcc/gcc-3.4.4/lib/gcc/x86_64-gnu-linux/3.4.4/include -D__KERNEL__ -Iinclude  -include include/linux/autoconf.h -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -ffreestanding -Os     -fomit-frame-pointer -pipe -msoft-float -mpreferred-stack-boundary=2 -fno-unit-at-a-time  -Iinclude/asm-i386/mach-default -Wdeclaration-after-statement  -I/usr/lib/arcom/realtime/include -Wall -ffast-math -mhard-float  -DMODULE -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(carte_aquisition)"  -D"KBUILD_MODNAME=KBUILD_STR(carte_aquisition)" -c -o /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/carte_aquisition.o /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/carte_aquisition.c
 
-deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o := \
-  /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.c \
+deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/carte_aquisition.o := \
+  /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/carte_aquisition.c \
   include/linux/init.h \
     $(wildcard include/config/modules.h) \
     $(wildcard include/config/hotplug.h) \
@@ -382,7 +382,8 @@ deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o := \
     $(wildcard include/config/vt.h) \
   /usr/lib/arcom/realtime/include/rtai_sched.h \
   /usr/lib/arcom/realtime/include/rtai_fifos.h \
+  /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3712.h \
 
-/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o: $(deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o)
+/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/carte_aquisition.o: $(deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/carte_aquisition.o)
 
-$(deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3718.o):
+$(deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/carte_aquisition.o):

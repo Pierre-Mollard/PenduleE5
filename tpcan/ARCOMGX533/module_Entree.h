@@ -25,7 +25,7 @@ MODULE_LICENSE("GPL");
 #define REG_PACER BASE+10
 
 
-int init3718(void);
+//int init3718(void);
 
 void SetChanel(int in_channel);
 

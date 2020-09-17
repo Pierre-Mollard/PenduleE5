@@ -27,29 +27,22 @@ MODULE_LICENSE("GPL");
 
 static RT_TASK acq;
 
-int init3712(void){
+void init3712(void){
   outb(128, PCM3712_OUT);
 
 }
 
-void SetDA(int channel, int value){
-  if(channel == 0){
+void setDA_async(int channel, int value){
+  if(channel == 1){
     PCM3712setda0(value);
   }
   else{
     PCM3712setda1(value);
   }
+  outb(1,PCM3712_SYNC);
 }
 
-void acq_task(int id){
-  while(1){
-    SetDA(0,156)
-    rt_task_wait_period();
-  }
-}
-
-
-static int init_module(void) {
+static int tpcan_init(void) {
 
   int ierr;
   RTIME now;
@@ -57,22 +50,22 @@ static int init_module(void) {
 
   //taches
   rt_set_oneshot_mode();
-  ierr = rt_task_init(&acq, acq_task, 0, STACK_SIZE, PRIORITE, 0, 0);
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
-  rt_task_make_periodic(&acq, now, nano2count(PERIODE_CONTROL));
  
-  printk("Init\n");
+  printk("Init Module Sortie\n");
  
  return(0);
 }
 
-static void exit_module(void) {
- stop_rt_timer(); 
- rt_task_delete(&acq);
+static void tpcan_exit(void) {
+ //outb(0,PCM3712_OUT); crash ? //TODO
+ stop_rt_timer();
 
 }
 
-module_init(init_module);
-module_exit(exit_module);
+module_init(tpcan_init);
+module_exit(tpcan_exit);
+
+EXPORT_SYMBOL(setDA_async);
