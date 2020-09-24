@@ -23,7 +23,7 @@ MODULE_LICENSE("GPL");
 static RT_TASK task_acq_c1;
 static RT_TASK task_acq_c2;
 
-void test_acq_c1(int id){ //test acquisition entree 1
+void test_acq_c1(int id){ //test sortie 1 et entree 1
   while(1){
   	ADRangeSelect(1, 8);
   	u16 value = ReadAD();
@@ -33,13 +33,16 @@ void test_acq_c1(int id){ //test acquisition entree 1
   }
 }
 
-void test_acq_c2(int id){//test entree 1 sur sortie 2
+void test_acq_c2(int id){//test acquisition entree 2 p/r signal ext
   while(1){
   	ADRangeSelect(2, 8);
   	u16 value = ReadAD();
+
+	if(value < 4096 && value > 0){
+		//printk("log acq2 lu (%u)\n", value);
+        	setDA_async(2, value); 
+	}
  
-  	//printk("log acq2 lu (%u)\n", value);
-        setDA_async(2, value); 
   	rt_task_wait_period();
   }
 }

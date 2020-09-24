@@ -34,39 +34,40 @@ int init3718(void){
 
 void SetChanel(int in_channel){
   sel_channel = in_channel;
-  printk("Definition channel : %d\n", in_channel);
+  //printk("Definition channel : %d\n", in_channel);
   outb(in_channel + in_channel<<4, REG_MUX); // à verif (p27)
 }
 
 void ADRangeSelect(int channel, int range){
   SetChanel(channel);
   outb(range, REG_RANGE); //Range code (p26) à définir
-  printk("Definition range : %d\n", range);
+  //printk("Definition range : %d\n", range);
 }
 
 u16 ReadAD(void){
-  printk("-Debut read\n");
+  printk("-Ch%u Debut read\n", sel_channel);
   outb(1, BASE);//trigger conversion
   int pret = inb(REG_STATUS);
-  printk("-Status : %d\n", pret);
+  //printk("-Status : %d\n", pret);
   if(pret == 48){//48 pour EOC et Int = 1, Mask : 16 pour software (INT) 7 pour EOC
-	printk("-Debut conversion\n");
+	//printk("-Debut conversion\n");
 	int channelLu = inb(BASE) && 15;
-	printk("-Channel conversion : %u\n", channelLu);
+	//printk("-Channel conversion : %u\n", channelLu);
 	if(channelLu == sel_channel){ //15 : masque pour les 4 lowbyte
-		printk("-Channel valide\n");
+		//printk("-Channel valide\n");
     		int lowbyte = inb(BASE)>>4;
-		printk("-lowbyte : %u\n", lowbyte);
+		//printk("-lowbyte : %u\n", lowbyte);
     		int highbyte = inb(REG_RANGE);
-		printk("-highbyte : %u\n", highbyte);
+		//printk("-highbyte : %u\n", highbyte);
 		u16 resultat = lowbyte;
 		resultat = resultat + (highbyte<<4);
+		printk("-Ch%u Fin read : %u\n", sel_channel, resultat);
     		return resultat;
   	}else{
 		printk("-Channel non valide (ignore)\n");
 	}
   }else{
-	printk("--ECHEC pas de INT\n");
+	printk("-Ch%u Fin read : ECHEC acquisition impossible (INT)\n", sel_channel);
 	return -1;
   }
   
