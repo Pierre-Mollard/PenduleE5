@@ -1,4 +1,4 @@
-obj-m	   := module_TestES.o
+obj-m	   := module_Entree.o
 
 PATH := /opt/x86_64/gcc/gcc-3.4.4/bin:$(PATH)
 KIT = arcom6

@@ -6,6 +6,7 @@
 #include <rtai.h>
 #include <rtai_sched.h>
 #include <rtai_fifos.h>
+#include <rtai_sem.h>
 
 MODULE_LICENSE("GPL");
 
@@ -24,10 +25,15 @@ MODULE_LICENSE("GPL");
 #define REG_MUX BASE+2
 #define REG_PACER BASE+10
 
+#define IT_ACQ 6
+
 int sel_channel = 0;
+u16 val_ch1 = 0;
+u16 val_ch2 = 0;
+SEM sem1;
 
 int init3718(void){
-  outb(0, REG_CTRL);
+  outb(0xE0, REG_CTRL); //activation des interruptions avec Interrupt Level : 
   outb(1, REG_PACER);
 
 }
@@ -47,30 +53,35 @@ void ADRangeSelect(int channel, int range){
 u16 ReadAD(void){
   printk("-Ch%u Debut read\n", sel_channel);
   outb(1, BASE);//trigger conversion
-  int pret = inb(REG_STATUS);
-  //printk("-Status : %d\n", pret);
-  if(pret == 48){//48 pour EOC et Int = 1, Mask : 16 pour software (INT) 7 pour EOC
-	//printk("-Debut conversion\n");
-	int channelLu = inb(BASE) && 15;
-	//printk("-Channel conversion : %u\n", channelLu);
-	if(channelLu == sel_channel){ //15 : masque pour les 4 lowbyte
-		//printk("-Channel valide\n");
-    		int lowbyte = inb(BASE)>>4;
-		//printk("-lowbyte : %u\n", lowbyte);
-    		int highbyte = inb(REG_RANGE);
-		//printk("-highbyte : %u\n", highbyte);
-		u16 resultat = lowbyte;
-		resultat = resultat + (highbyte<<4);
-		printk("-Ch%u Fin read : %u\n", sel_channel, resultat);
-    		return resultat;
-  	}else{
-		printk("-Channel non valide (ignore)\n");
-	}
-  }else{
-	printk("-Ch%u Fin read : ECHEC acquisition impossible (INT)\n", sel_channel);
-	return -1;
-  }
   
+  
+  rt_sem_wait(&sem1);
+  
+  if(sel_channel == 1){
+	return val_ch1;
+  }else{
+	return val_ch2;
+ }
+  
+}
+
+void gestionnaire_it(void){
+  rt_pend_global_irq(IT_ACQ);
+
+  int channelLu = inb(BASE) && 15;
+
+  int lowbyte = inb(BASE)>>4;
+  int highbyte = inb(REG_RANGE);
+  u16 resultat = lowbyte;
+  resultat = resultat + (highbyte<<4);
+
+  if(channelLu == 1){
+	val_ch1 = resultat;
+  }else{
+	val_ch2 = resultat;
+  }
+
+  rt_sem_signal(&sem1);
 }
 
 static int tpcan_init(void) {
@@ -82,9 +93,13 @@ static int tpcan_init(void) {
   //taches
   rt_set_oneshot_mode();
   
+  rt_typed_sem_init(&sem1, 0, BIN_SEM);
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
+
+  rt_request_global_irq(IT_ACQ, gestionnaire_it);
+  rt_free_global_irq(IT_ACQ);
 
   printk("Init Module Entree\n");
  
@@ -93,7 +108,7 @@ static int tpcan_init(void) {
 
 static void tpcan_exit(void) {
  stop_rt_timer(); 
-
+ rt_sem_delete(&sem1);
 }
 
 module_init(tpcan_init);
