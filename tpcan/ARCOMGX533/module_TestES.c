@@ -6,6 +6,7 @@
 #include <rtai.h>
 #include <rtai_sched.h>
 #include <rtai_fifos.h>
+#include <rtai_sem.h>
 
 #include"module_Entree.h"
 #include"module_Sortie.h"
@@ -47,7 +48,7 @@ void test_acq_c2(int id){//test acquisition entree 2 p/r signal ext
   }
 }
 
-static int tpcan_init(void) {
+static int modTest_init(void) {
 
   int ierr;
   RTIME now;
@@ -69,13 +70,13 @@ static int tpcan_init(void) {
  return(0);
 }
 
-static void tpcan_exit(void) {
+static void modTest_exit(void) {
  stop_rt_timer(); 
  rt_task_delete(&task_acq_c1);
  rt_task_delete(&task_acq_c2);
 
 }
 
-module_init(tpcan_init);
-module_exit(tpcan_exit);
+module_init(modTest_init);
+module_exit(modTest_exit);
 

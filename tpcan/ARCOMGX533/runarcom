@@ -9,6 +9,8 @@ EOF
 read junk
 sudo insmod /usr/realtime/modules/rtai_hal.ko
 sudo insmod /usr/realtime/modules/rtai_sched.ko
+sudo insmod /usr/realtime/modules/rtai_sem.ko
+sudo insmod /usr/realtime/modules/rtai_fifos.ko
 sudo insmod 3712.ko
 sudo insmod module_Entree.ko
 sudo insmod module_Sortie.ko
@@ -23,5 +25,7 @@ sudo rmmod module_TestES
 sudo rmmod module_Sortie
 sudo rmmod module_Entree
 sudo rmmod 3712
+sudo rmmod rtai_fifos
+sudo rmmod rtai_sem
 sudo rmmod rtai_sched
 sudo rmmod rtai_hal

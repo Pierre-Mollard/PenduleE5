@@ -382,6 +382,8 @@ deps_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_TestES.o := \
     $(wildcard include/config/vt.h) \
   /usr/lib/arcom/realtime/include/rtai_sched.h \
   /usr/lib/arcom/realtime/include/rtai_fifos.h \
+  /usr/lib/arcom/realtime/include/rtai_sem.h \
+  /usr/lib/arcom/realtime/include/rtai_nam2num.h \
   /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_Entree.h \
   /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_Sortie.h \
   /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/3712.h \
