@@ -35,10 +35,11 @@ void methode_acq_angle(int id){ //angle sur channel 1
   	ADRangeSelect(1, 8);
   	u16 value = ReadAD();
 	float valueVolt = (value-2048)*10/4095;
-        float valueAngle = valueVolt
+        float valueAngle = valueVolt*22/3.620;
  
   	printk("angle (bit) : %u\n", value);
   	printk("angle (volt) : %u\n", valueVolt);
+  	printk("angle (°) : %u\n", valueAngle);
   	rt_task_wait_period();
   }
 }
@@ -47,8 +48,12 @@ void methode_acq_position(int id){//position sur channel 2
   while(1){
   	ADRangeSelect(2, 8);
   	u16 value = ReadAD();
-
-        printk("position : %u\n", value);
+	float valueVolt = (value-2048)*10/4095;
+        float valuePos = valueVolt*22/3.620;
+ 
+  	printk("position (bit) : %u\n", value);
+  	printk("position (volt) : %u\n", valueVolt);
+  	printk("position (°) : %u\n", valuePos);
   	rt_task_wait_period();
   }
 }

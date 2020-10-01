@@ -54,13 +54,9 @@ void ADRangeSelect(int channel, int range){
 u16 ReadAD(void){
   printk("-Ch%u Debut read\n", sel_channel);
 
-//////////// ZONE NON PREEMPTIVE
-
   rt_sleep(nano2count(10)); //wait 10ns
 
   outb(1, BASE);//trigger conversion
-
-  //rt_sem_wait(&semACQ);// attente fin conversion
 
   while((inb(REG_STATUS) && 0x10) == 0){
     printk("- Attente conversion");
@@ -79,11 +75,7 @@ u16 ReadAD(void){
   u16 resultat = lowbyte;
   resultat = resultat + (highbyte<<4);
 
-
   outb(1, REG_STATUS);//clear INT bit
-
-
-//////////// FIN ZONE NON PREEMPTIVE
 
   printk("-Ch%u Fin read\n", sel_channel);
 
