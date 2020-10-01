@@ -35,7 +35,7 @@ SEM sem2;
 SEM semACQ; 
 
 int init3718(void){
-  outb(0x00, REG_CTRL); //désactivation des interruptions avec Interrupt Level : 7
+  outb(0xF0, REG_CTRL); //activation des interruptions avec Interrupt Level : 7
   outb(1, REG_PACER); //desactivé
 }
 
@@ -56,51 +56,38 @@ u16 ReadAD(void){
 
 //////////// ZONE NON PREEMPTIVE
 
-  rt_sleep(nano2count(10)); //wait 10ns
-
   outb(1, BASE);//trigger conversion
 
-  //rt_sem_wait(&semACQ);// attente fin conversion
-
-  while((inb(REG_STATUS) && 0x10) == 0){
-    printk("- Attente conversion");
+  int channelLu = 0;
+  while(inb(REG_STATUS && 0x10) == 0){
+     if(inb(REG_STATUS && 0x10) == 1){
+	channelLu = inb(BASE) && 15;
+    	printk("channel lu : %u\n", channelLu);
+    	if(channelLu == sel_channel){
+        	int lowbyte = inb(BASE)>>4;
+  		int highbyte = inb(REG_RANGE);
+  		u16 resultat = lowbyte;
+  		resultat = resultat + (highbyte<<4);
+  		outb(1, REG_STATUS);//clear INT bit
+		return resultat;
+     	}
+     }else{
+	printk("-Ch%u Attente Conversion\n", sel_channel);
+     }
   }
-
-  rt_sleep(nano2count(10)); //wait 10ns
-
-  int channelLu = inb(BASE) && 0x0F;
-
-  if(channelLu != sel_channel){
-  	printk("- SUPERPOSITION DES TACHES Channel %u a vu %u\n", sel_channel, channelLu);
-  }
-
-  int lowbyte = inb(BASE)>>4;
-  int highbyte = inb(REG_RANGE);
-  u16 resultat = lowbyte;
-  resultat = resultat + (highbyte<<4);
-
-
-  outb(1, REG_STATUS);//clear INT bit
-
+  
 
 //////////// FIN ZONE NON PREEMPTIVE
 
   printk("-Ch%u Fin read\n", sel_channel);
 
-  return resultat;
+  return 0;
   
 }
 
 void gestionnaire_it(void){
-  //printk("- Fin Acquisition Detectee\n");
-
-  //int channelLu = inb(BASE) && 15;
-  //printk("- !! %u a vu %u\n", sel_channel, channelLu);
-  //if(channelLu == sel_channel){
-    rt_sem_signal(&semACQ);
-  //}
+  rt_sem_signal(&semACQ);
   rt_ack_irq(IT_ACQ);
-  //printk("- Inter libere\n");
 }
 
 static int modE_init(void) {

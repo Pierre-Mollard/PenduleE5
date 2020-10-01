@@ -17,36 +17,32 @@ MODULE_LICENSE("GPL");
 #define STACK_SIZE  2000
 #define TICK_PERIOD 1000000    //  1 ms
 #define PERIODE_CONTROL 20000000 //20ms
+#define PERIODE_CONTROL_10 10000000 //10ms
 #define N_BOUCLE 10000000
 #define NUMERO 1
 #define PRIORITE 1
 
+SEM sem1; 
+SEM sem2; 
+
 static RT_TASK task_acq_c1;
-static RT_TASK task_acq_c2;
 
-void test_acq_c1(int id){ //test sortie 1 et entree 1
-  while(1){
-  	ADRangeSelect(1, 8);
-  	u16 value = ReadAD();
- 
-  	printk("log acq1 lu (%u)\n", value);
-  	rt_task_wait_period();
-  }
-}
-
-void test_acq_c2(int id){//test acquisition entree 2 p/r signal ext
+void test_acq_c1(int id){//test acquisition entree 2 p/r signal ext
   while(1){
   	ADRangeSelect(2, 8);
-  	u16 value = ReadAD();
+  	u16 value1 = ReadAD();
+	
+	setDA_async(2, value1); 
 
-	if(value < 4096 && value > 0){
-		//printk("log acq2 lu (%u)\n", value);
-        	setDA_async(2, value); 
-	}
+	ADRangeSelect(1, 8);
+  	u16 value2 = ReadAD();
+	
+	setDA_async(1, value2); 
  
   	rt_task_wait_period();
   }
 }
+
 
 static int modTest_init(void) {
 
@@ -56,12 +52,13 @@ static int modTest_init(void) {
   //taches
   rt_set_oneshot_mode();
   ierr = rt_task_init(&task_acq_c1, test_acq_c1, 0, STACK_SIZE, PRIORITE, 0, 0);
-  ierr = rt_task_init(&task_acq_c2, test_acq_c2, 0, STACK_SIZE, PRIORITE, 0, 0);
+
+  rt_typed_sem_init(&sem1, 1, BIN_SEM);
+  rt_typed_sem_init(&sem2, 0, BIN_SEM);
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
   rt_task_make_periodic(&task_acq_c1, now, nano2count(PERIODE_CONTROL));
-  rt_task_make_periodic(&task_acq_c2, now, nano2count(PERIODE_CONTROL));
  
   printk("Init Module Test\n");
 
@@ -72,8 +69,9 @@ static int modTest_init(void) {
 
 static void modTest_exit(void) {
  stop_rt_timer(); 
+ rt_sem_delete(&sem1);
+ rt_sem_delete(&sem2);
  rt_task_delete(&task_acq_c1);
- rt_task_delete(&task_acq_c2);
 
 }
 
