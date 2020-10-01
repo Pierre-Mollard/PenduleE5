@@ -47,7 +47,7 @@ void SetChanel(int in_channel){
 
 void ADRangeSelect(int channel, int range){
   SetChanel(channel);
-  outb(range, REG_RANGE); //Range code (p26) à définir
+  outb(range, REG_RANGE); //Range code (p26) à définir ( nous utilisons +-10Vdonc range = 0x08)
   //printk("Definition range : %d\n", range);
 }
 
@@ -56,18 +56,12 @@ u16 ReadAD(void){
 
   rt_sleep(nano2count(10)); //wait 10ns
 
-  outb(1, BASE);//trigger conversion
+  outb(1, BASE);//Lance la conversion
 
-  while((inb(REG_STATUS) && 0x10) == 0){
-    printk("- Attente conversion");
+  while((inb(REG_STATUS) && 0x80) == 0){ //La conversion est en cours (EOC = 0)
   }
 
-  rt_sleep(nano2count(10)); //wait 10ns
-
-  int channelLu = inb(BASE) && 0x0F;
-
-  if(channelLu != sel_channel){
-  	printk("- SUPERPOSITION DES TACHES Channel %u a vu %u\n", sel_channel, channelLu);
+  while((inb(REG_STATUS) && 0x10) == 0){ //Il est nécessaire d'attendre que INT=1 pour lire la data
   }
 
   int lowbyte = inb(BASE)>>4;
@@ -75,7 +69,12 @@ u16 ReadAD(void){
   u16 resultat = lowbyte;
   resultat = resultat + (highbyte<<4);
 
-  outb(1, REG_STATUS);//clear INT bit
+  int channelLu = inb(BASE) && 0x0F;
+  if(channelLu != sel_channel){ //Verification qu'on a bien lu le bon channel
+  	printk("- SUPERPOSITION DES TACHES Channel %u a vu %u\n", sel_channel, channelLu);
+  }
+
+  outb(1, REG_STATUS);//clear INT bit en écrivant une valeur dedans
 
   printk("-Ch%u Fin read\n", sel_channel);
 
