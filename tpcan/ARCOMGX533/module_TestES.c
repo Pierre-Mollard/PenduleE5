@@ -28,14 +28,15 @@ SEM sem2;
 static RT_TASK task_acq_c1;
 
 void test_acq_c1(int id){//test acquisition entree 2 p/r signal ext
+  u16 value1, value2;
   while(1){
-  	ADRangeSelect(2, 8);
-  	u16 value1 = ReadAD();
+  	ADRangeSelect(0, 8);
+  	value1 = ReadAD();
 	
-	setDA_async(2, value1); 
+	setDA_async(0, value1); 
 
 	ADRangeSelect(1, 8);
-  	u16 value2 = ReadAD();
+  	value2 = ReadAD();
 	
 	setDA_async(1, value2); 
  

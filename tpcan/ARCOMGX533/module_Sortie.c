@@ -33,7 +33,7 @@ void init3712(void){
 }
 
 void setDA_async(int channel, int value){
-  if(channel == 1){
+  if(channel == 0){
     PCM3712setda0(value);
   }
   else{
@@ -60,7 +60,6 @@ static int tpcan_init(void) {
 }
 
 static void tpcan_exit(void) {
- //outb(0,PCM3712_OUT); crash ? //TODO
  stop_rt_timer();
 
 }

@@ -42,7 +42,7 @@ int init3718(void){
 void SetChanel(int in_channel){
   sel_channel = in_channel;
   //printk("Definition channel : %d\n", in_channel);
-  outb(in_channel + in_channel<<4, REG_MUX); // à verif (p27)
+  outb(in_channel + (in_channel<<4), REG_MUX); // à verif (p27)
 }
 
 void ADRangeSelect(int channel, int range){
@@ -54,14 +54,11 @@ void ADRangeSelect(int channel, int range){
 u16 ReadAD(void){
   printk("-Ch%u Debut read\n", sel_channel);
 
-  rt_sleep(nano2count(10)); //wait 10ns
+  rt_busy_sleep(nano2count(PERIODE_CONTROL/2)); //wait 10ms
 
   outb(1, BASE);//Lance la conversion
 
   while((inb(REG_STATUS) && 0x80) == 0){ //La conversion est en cours (EOC = 0)
-  }
-
-  while((inb(REG_STATUS) && 0x10) == 0){ //Il est nécessaire d'attendre que INT=1 pour lire la data
   }
 
   int lowbyte = inb(BASE)>>4;
@@ -74,7 +71,7 @@ u16 ReadAD(void){
   	printk("- SUPERPOSITION DES TACHES Channel %u a vu %u\n", sel_channel, channelLu);
   }
 
-  outb(1, REG_STATUS);//clear INT bit en écrivant une valeur dedans
+  outb(0xFF, REG_STATUS);//clear INT bit en écrivant une valeur dedans
 
   printk("-Ch%u Fin read\n", sel_channel);
 
