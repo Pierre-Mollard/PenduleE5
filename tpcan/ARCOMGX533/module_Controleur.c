@@ -20,6 +20,8 @@ MODULE_LICENSE("GPL");
 #define NUMERO 1
 #define PRIORITE 1
 
+#define FIFO 0
+
 static RT_TASK task_ctrl;
 
 
@@ -62,20 +64,32 @@ void methode_ctrl(int id){ //tâche controleur
   u16 cmde = 0;
   u16 value0, value1;
   float valueVolt0, valueVolt1;
+  u16 temp1, temp2;
+  float valueNorm0, valueNorm1;
+  float value0f, value1f;
   while(1){
   	// Code iteratif du controle
 
 	// Acquisition angle/position
-	value0 = getAngle();
-	value1 = getPos();
-	valueVolt0 = (value0-2048)*10/4095;
-	valueVolt1 = (value1-2048)*10/4095;
-	
-	printk("Resultat Angle Volt (-10/+10): %u\n", valueVolt0*1000);
-	printk("Resultat Position Volt (-10/+10): %u\n", valueVolt1*1000);
+	value0 = getAngle(&ptr_angle);
+	value1 = getPos(&ptr_pos);
 
-	y[0] = valueVolt0;
-	y[1] = valueVolt1;
+	//value0f = value0;
+	//value1f = value1;
+
+	valueNorm0 = (value0-2048)/2048;
+	valueNorm1 = (value1-2048)/2048;
+	/*
+	temp1 = valueNorm0;
+	temp2 = valueNorm1;
+	
+	printk("Resultat Angle Normalise (-10/+10): %u\n", temp1);
+	printk("Resultat Position Normalise (-10/+10): %u\n", temp2);
+	*/
+	y[0] = valueNorm0*17.13;
+	y[1] = valueNorm1*1;
+
+        rtf_put(FIFO, &valueNorm0, sizeof(valueNorm0));
 
 	printk("Matrice Y : [%u, %u]\n", y[0], y[1]);
 
@@ -84,14 +98,14 @@ void methode_ctrl(int id){ //tâche controleur
         x[1] = adc[1][0]*x[0] + adc[1][1]*x[1] + adc[1][2]*x[2] + adc[1][3]*x[3] + bdc[1][0]*y[0] + bdc[1][1]*y[1];
         x[2] = adc[2][0]*x[0] + adc[2][1]*x[1] + adc[2][2]*x[2] + adc[2][3]*x[3] + bdc[2][0]*y[0] + bdc[2][1]*y[1];
         x[3] = adc[3][0]*x[0] + adc[3][1]*x[1] + adc[3][2]*x[2] + adc[3][3]*x[3] + bdc[3][0]*y[0] + bdc[3][1]*y[1];
-	u = cdc[0]*x[0] + cdc[1]*x[1] + cdc[2]*x[2] + cdc[3]*x[3];
+	u = 1.4*cdc[0]*x[0] + 1.4*cdc[1]*x[1] + 1.4*cdc[2]*x[2] + 1.4*cdc[3]*x[3]; //1.4* = gain yolo
 
 	// Convertion en binaire
-	cmde = u*1000;
+	cmde = u;
 	//cmdd = floor(u*1000) - floor(u)*1000;
 
 	// Envoi commande
-	//setCmd(
+	setCmd(cmde);
 	printk("Resultat Commande (?/?) : %u\n", cmde);
 
   	rt_task_wait_period();
@@ -104,6 +118,7 @@ static int modC_init(void) {
   RTIME now;
 
   // Code initial du controleur
+  rtf_create(FIFO, 8000);
 
   //taches
   rt_set_oneshot_mode();
@@ -120,6 +135,7 @@ static int modC_init(void) {
 
 static void modC_exit(void) {
  stop_rt_timer(); 
+ rtf_destroy(FIFO);
  rt_task_delete(&task_ctrl);
 
 }

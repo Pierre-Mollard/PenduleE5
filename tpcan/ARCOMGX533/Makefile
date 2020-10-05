@@ -1,7 +1,7 @@
-obj-m	   := module_TestES.o module_Entree.o module_Sortie.o module_AR.o module_Controleur.o module_TestAR.o
+obj-m	   := module_TestES.o module_Entree.o module_Sortie.o module_AR.o module_Controleur.o
 
 PATH := /opt/x86_64/gcc/gcc-3.4.4/bin:$(PATH)
-KIT = arcom12
+KIT = arcom7
 CURRENT = 2.6.16.14-arcom1
 KDIR = /usr/lib/arcom/lib/modules/${CURRENT}/build
 PWD = $(shell pwd)

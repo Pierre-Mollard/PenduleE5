@@ -24,9 +24,10 @@ MODULE_LICENSE("GPL");
 #define REG_MUX BASE+2
 #define REG_PACER BASE+10
 
+u16 ptr_angle;
+u16 ptr_pos;
 
-u16 getAngle(void);
-
-u16 getPos(void);
+u16 getAngle(u16 * ptr_angle);
+u16 getPos(u16 * ptr_pos);
 
 void setCmd(u16 value);

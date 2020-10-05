@@ -43,12 +43,14 @@ void methode_acq(int id){ //acquisition
   }
 }
 
-u16 getAngle(void){
-  return value0;
+u16 getAngle(u16 * ptr_angle){
+  *ptr_angle = value0;
+  return *ptr_angle;
 }
 
-u16 getPos(void){
-  return value1;
+u16 getPos(u16 * ptr_pos){
+  *ptr_pos = value1;
+  return *ptr_pos;
 }
 
 void setCmd(u16 value){
