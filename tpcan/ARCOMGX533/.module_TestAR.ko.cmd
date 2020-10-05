@@ -1,0 +1,1 @@
+cmd_/user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_TestAR.ko := ld -m elf_i386 -m elf_i386 -r -o /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_TestAR.ko /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_TestAR.o /user/mollardp/homedir/PenduleE5/tpcan/ARCOMGX533/module_TestAR.mod.o

@@ -52,7 +52,7 @@ void ADRangeSelect(int channel, int range){
 }
 
 u16 ReadAD(void){
-  printk("-Ch%u Debut read\n", sel_channel);
+  //printk("-Ch%u Debut read\n", sel_channel);
 
   rt_busy_sleep(nano2count(PERIODE_CONTROL/2)); //wait 10ms
 
@@ -68,12 +68,12 @@ u16 ReadAD(void){
 
   int channelLu = inb(BASE) && 0x0F;
   if(channelLu != sel_channel){ //Verification qu'on a bien lu le bon channel
-  	printk("- SUPERPOSITION DES TACHES Channel %u a vu %u\n", sel_channel, channelLu);
+  	//printk("- SUPERPOSITION DES TACHES Channel %u a vu %u\n", sel_channel, channelLu);
   }
 
   outb(0xFF, REG_STATUS);//clear INT bit en écrivant une valeur dedans
 
-  printk("-Ch%u Fin read\n", sel_channel);
+  //printk("-Ch%u Fin read\n", sel_channel);
 
   return resultat;
   

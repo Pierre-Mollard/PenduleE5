@@ -14,14 +14,16 @@ sudo insmod /usr/realtime/modules/rtai_fifos.ko
 sudo insmod 3712.ko
 sudo insmod module_Entree.ko
 sudo insmod module_Sortie.ko
-sudo insmod module_TestES.ko
+sudo insmod module_AR.ko
+sudo insmod module_Controleur.ko
 
 lsmod
 echo "Le programme fontionne :o"
 echo "Tapez <return> pour l'arreter."
 read junk
 
-sudo rmmod module_TestES
+sudo rmmod module_Controleur
+sudo rmmod module_AR
 sudo rmmod module_Sortie
 sudo rmmod module_Entree
 sudo rmmod 3712

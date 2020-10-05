@@ -21,41 +21,38 @@ MODULE_LICENSE("GPL");
 #define NUMERO 1
 #define PRIORITE 1
 
-static RT_TASK task_acq_angle;
-static RT_TASK task_acq_position;
+static RT_TASK task_acq;
+u16 value0, value1;
 
-float angle_MAX = 3.620;
-float angle_MIN = -3.519;
-
-float position_MAX = 8.413;
-float position_MIN = -8.373;
-
-void methode_acq_angle(int id){ //angle sur channel 1
+void methode_acq(int id){ //acquisition
   while(1){
-  	ADRangeSelect(1, 8);
-  	u16 value = ReadAD();
-	float valueVolt = (value-2048)*10/4095;
-        float valueAngle = valueVolt*22/3.620;
- 
-  	printk("angle (bit) : %u\n", value);
-  	printk("angle (volt) : %u\n", valueVolt);
-  	printk("angle (°) : %u\n", valueAngle);
+        printk("-------------\n");
+
+        //angle sur channel 0
+  	ADRangeSelect(0, 8);
+  	value0 = ReadAD();
+	printk("Resultat Angle (0/4096) : %u\n", value0);
+
+	//position sur channel 1
+	ADRangeSelect(1, 8);
+  	value1 = ReadAD();
+	printk("Resultat Position (0/4096) : %u\n", value1);
+	
+
   	rt_task_wait_period();
   }
 }
 
-void methode_acq_position(int id){//position sur channel 2
-  while(1){
-  	ADRangeSelect(2, 8);
-  	u16 value = ReadAD();
-	float valueVolt = (value-2048)*10/4095;
-        float valuePos = valueVolt*22/3.620;
- 
-  	printk("position (bit) : %u\n", value);
-  	printk("position (volt) : %u\n", valueVolt);
-  	printk("position (°) : %u\n", valuePos);
-  	rt_task_wait_period();
-  }
+u16 getAngle(void){
+  return value0;
+}
+
+u16 getPos(void){
+  return value1;
+}
+
+void setCmd(u16 value){
+  setDA_async(0, value); 
 }
 
 static int modAR_init(void) {
@@ -65,13 +62,11 @@ static int modAR_init(void) {
 
   //taches
   rt_set_oneshot_mode();
-  ierr = rt_task_init(&task_acq_angle, methode_acq_angle, 0, STACK_SIZE, PRIORITE, 0, 0);
-  ierr = rt_task_init(&task_acq_position, methode_acq_position, 0, STACK_SIZE, PRIORITE, 0, 0);
+  ierr = rt_task_init(&task_acq, methode_acq, 0, STACK_SIZE, PRIORITE, 0, 0);
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
-  rt_task_make_periodic(&task_acq_angle, now, nano2count(PERIODE_CONTROL));
-  rt_task_make_periodic(&task_acq_position, now, nano2count(PERIODE_CONTROL));
+  rt_task_make_periodic(&task_acq, now, nano2count(PERIODE_CONTROL));
  
   printk("Init Module Acquisition Restitution (AR)\n");
  
@@ -80,11 +75,13 @@ static int modAR_init(void) {
 
 static void modAR_exit(void) {
  stop_rt_timer(); 
- rt_task_delete(&task_acq_angle);
- rt_task_delete(&task_acq_position);
+ rt_task_delete(&task_acq);
 
 }
 
 module_init(modAR_init);
 module_exit(modAR_exit);
 
+EXPORT_SYMBOL(getAngle);
+EXPORT_SYMBOL(getPos);
+EXPORT_SYMBOL(setCmd);
