@@ -33,6 +33,8 @@ void methode_acq(int id){ //acquisition
   	value0 = ReadAD();
 	printk("Resultat Angle (0/4096) : %u\n", value0);
 
+	//wait TODO 
+
 	//position sur channel 1
 	ADRangeSelect(1, 8);
   	value1 = ReadAD();

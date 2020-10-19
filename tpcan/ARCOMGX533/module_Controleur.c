@@ -20,23 +20,21 @@ MODULE_LICENSE("GPL");
 #define NUMERO 1
 #define PRIORITE 1
 
-#define FIFO 0
-
 static RT_TASK task_ctrl;
 
 
 //matrice de modélisation du systeme
-float adc[4][4] = {{0.6300, -0.1206, -0.0008, 0.0086}, {-0.0953, 0.6935, 0.0107, 0.0012}, {-0.2896, -1.9184, 1.1306, 0.2351}, {-3.9680, -1.7733, -0.1546, 0.7222}};
-float bdc[4][2] = {{0.3658, 0.1200}, {0.0993, 0.3070}, {1.0887, 2.0141}, {3.1377, 1.6599}};
-float cdc[4] = {-80.3092, -9.6237, -14.1215, -23.6260};
-float ddc[2] = {0, 0};
+float adc[4][4] = {{0.6300f, -0.1206f, -0.0008f, 0.0086f}, {-0.0953f, 0.6935f, 0.0107f, 0.0012f}, {-0.2896f, -1.9184f, 1.1306f, 0.2351f}, {-3.9680f, -1.7733f, -0.1546f, 0.7222f}};
+float bdc[4][2] = {{0.3658f, 0.1200f}, {0.0993f, 0.3070f}, {1.0887f, 2.0141f}, {3.1377f, 1.6599f}};
+float cdc[4] = {-80.3092f, -9.6237f, -14.1215f, -23.6260f};
+float ddc[2] = {0.0f, 0.0f};
 
 //vecteur d'état
-float x[4] = {0, 0, 0, 0};
+float x[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 //vecteur sortie
-float y[2] = {0, 0};
+float y[2] = {0.0f, 0.0f};
 //vecteur commande
-float u = 0;
+float u = 0.0f;
 
 /*
 float[4] mulmatrice444(float[4][4] px, float[4] py){
@@ -64,9 +62,8 @@ void methode_ctrl(int id){ //tâche controleur
   u16 cmde = 0;
   u16 value0, value1;
   float valueVolt0, valueVolt1;
-  u16 temp1, temp2;
   float valueNorm0, valueNorm1;
-  float value0f, value1f;
+  float temp[4] = {0.0f, 0.0f, 0.0f, 0.0f};
   while(1){
   	// Code iteratif du controle
 
@@ -74,40 +71,45 @@ void methode_ctrl(int id){ //tâche controleur
 	value0 = getAngle(&ptr_angle);
 	value1 = getPos(&ptr_pos);
 
-	//value0f = value0;
-	//value1f = value1;
-
-	valueNorm0 = (value0-2048)/2048;
-	valueNorm1 = (value1-2048)/2048;
-	/*
-	temp1 = valueNorm0;
-	temp2 = valueNorm1;
+	valueNorm0 = (value0-2071)*0.298974/(2856-2071);		//17.13 °
+	valueNorm1 = (value1-2000)*0.91/(3710-2000);
 	
-	printk("Resultat Angle Normalise (-10/+10): %u\n", temp1);
-	printk("Resultat Position Normalise (-10/+10): %u\n", temp2);
-	*/
-	y[0] = valueNorm0*17.13;
-	y[1] = valueNorm1*1;
+	printk("Resultat Angle (cal): %u\n", value0);
+	printk("Resultat Pos (cal): %u\n", value1);
 
-        rtf_put(FIFO, &valueNorm0, sizeof(valueNorm0));
+	//printk("Resultat Angle (-10/+10): %d\n", (int)(valueNorm0*1000));
+	//printk("Resultat Position (-10/+10): %d\n", (int)(valueNorm1*1000));
+	
+	y[0] = valueNorm0;
+	y[1] = valueNorm1;
 
-	printk("Matrice Y : [%u, %u]\n", y[0], y[1]);
+	//printk("Matrice Y : [%d, %d]\n", (int)(y[0]*1000), (int)(y[1]*1000));
 
 	// Calcul vecteur etat et commande
-	x[0] = adc[0][0]*x[0] + adc[0][1]*x[1] + adc[0][2]*x[2] + adc[0][3]*x[3] + bdc[0][0]*y[0] + bdc[0][1]*y[1];
-        x[1] = adc[1][0]*x[0] + adc[1][1]*x[1] + adc[1][2]*x[2] + adc[1][3]*x[3] + bdc[1][0]*y[0] + bdc[1][1]*y[1];
-        x[2] = adc[2][0]*x[0] + adc[2][1]*x[1] + adc[2][2]*x[2] + adc[2][3]*x[3] + bdc[2][0]*y[0] + bdc[2][1]*y[1];
-        x[3] = adc[3][0]*x[0] + adc[3][1]*x[1] + adc[3][2]*x[2] + adc[3][3]*x[3] + bdc[3][0]*y[0] + bdc[3][1]*y[1];
-	u = 1.4*cdc[0]*x[0] + 1.4*cdc[1]*x[1] + 1.4*cdc[2]*x[2] + 1.4*cdc[3]*x[3]; //1.4* = gain yolo
+	temp[0] = adc[0][0]*x[0] + adc[0][1]*x[1] + adc[0][2]*x[2] + adc[0][3]*x[3] + bdc[0][0]*y[0] + bdc[0][1]*y[1];
+        temp[1] = adc[1][0]*x[0] + adc[1][1]*x[1] + adc[1][2]*x[2] + adc[1][3]*x[3] + bdc[1][0]*y[0] + bdc[1][1]*y[1];
+        temp[2] = adc[2][0]*x[0] + adc[2][1]*x[1] + adc[2][2]*x[2] + adc[2][3]*x[3] + bdc[2][0]*y[0] + bdc[2][1]*y[1];
+        temp[3] = adc[3][0]*x[0] + adc[3][1]*x[1] + adc[3][2]*x[2] + adc[3][3]*x[3] + bdc[3][0]*y[0] + bdc[3][1]*y[1];
+	x[0] = temp[0];
+	x[1] = temp[1];
+	x[2] = temp[2];
+	x[3] = temp[3];
+	u = cdc[0]*x[0] + cdc[1]*x[1] + cdc[2]*x[2] + cdc[3]*x[3]; //1.4* = gain yolo
+
+	//printk("Matrice X : [%d, %d, %d, %d]\n", (int)(x[0]*1000), (int)(x[1]*1000), (int)(x[2]*1000), (int)(x[3]*1000));
 
 	// Convertion en binaire
-	cmde = u;
-	//cmdd = floor(u*1000) - floor(u)*1000;
+	if(u >= 10){
+		u = 10;
+	}else if(u <= -10){
+		u = -10;
+	}
+	cmde = (u+10)*(-4095)/20;
 
 	// Envoi commande
 	setCmd(cmde);
-	printk("Resultat Commande (?/?) : %u\n", cmde);
-
+	//printk("Resultat Commande (-10/+10) : %d (%u)\n", (int)(u*1000), cmde);
+	
   	rt_task_wait_period();
   }
 }
@@ -118,11 +120,10 @@ static int modC_init(void) {
   RTIME now;
 
   // Code initial du controleur
-  rtf_create(FIFO, 8000);
 
   //taches
   rt_set_oneshot_mode();
-  ierr = rt_task_init(&task_ctrl, methode_ctrl, 0, STACK_SIZE, PRIORITE, 0, 0);
+  ierr = rt_task_init(&task_ctrl, methode_ctrl, 0, STACK_SIZE, PRIORITE, 1, 0); //Registre float (cf plus tard)
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
@@ -134,8 +135,7 @@ static int modC_init(void) {
 }
 
 static void modC_exit(void) {
- stop_rt_timer(); 
- rtf_destroy(FIFO);
+ stop_rt_timer();
  rt_task_delete(&task_ctrl);
 
 }
