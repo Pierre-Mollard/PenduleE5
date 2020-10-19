@@ -16,5 +16,5 @@ __attribute__((section(".gnu.linkonce.this_module"))) = {
 static const char __module_depends[]
 __attribute_used__
 __attribute__((section(".modinfo"))) =
-"depends=module_Sortie,module_Entree";
+"depends=module_Entree,module_Sortie";
 

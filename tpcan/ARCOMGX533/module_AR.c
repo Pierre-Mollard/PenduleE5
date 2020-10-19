@@ -29,16 +29,17 @@ void methode_acq(int id){ //acquisition
         printk("-------------\n");
 
         //angle sur channel 0
-  	ADRangeSelect(0, 8);
+  	SetChanel(0);
   	value0 = ReadAD();
-	printk("Resultat Angle (0/4096) : %u\n", value0);
+	//printk("Resultat Angle (0/4096) : %u\n", value0);
 
-	//wait TODO 
+	//wait 
+	rt_busy_sleep(nano2count(TICK_PERIOD*5));
 
 	//position sur channel 1
-	ADRangeSelect(1, 8);
+  	SetChanel(1);
   	value1 = ReadAD();
-	printk("Resultat Position (0/4096) : %u\n", value1);
+	//printk("Resultat Position (0/4096) : %u\n", value1);
 	
 
   	rt_task_wait_period();
@@ -66,13 +67,15 @@ static int modAR_init(void) {
 
   //taches
   rt_set_oneshot_mode();
-  ierr = rt_task_init(&task_acq, methode_acq, 0, STACK_SIZE, PRIORITE, 0, 0);
+  ierr = rt_task_init(&task_acq, methode_acq, 0, STACK_SIZE, PRIORITE, 1, 0);
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
-  rt_task_make_periodic(&task_acq, now, nano2count(PERIODE_CONTROL));
+  rt_task_make_periodic(&task_acq, now, nano2count(PERIODE_CONTROL/2));
  
   printk("Init Module Acquisition Restitution (AR)\n");
+  ADRangeSelect(0, 8);
+  ADRangeSelect(1, 8);
  
  return(0);
 }

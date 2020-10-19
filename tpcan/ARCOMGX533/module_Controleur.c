@@ -71,8 +71,8 @@ void methode_ctrl(int id){ //tâche controleur
 	value0 = getAngle(&ptr_angle);
 	value1 = getPos(&ptr_pos);
 
-	valueNorm0 = (value0-2071)*0.298974/(2856-2071);		//17.13 °
-	valueNorm1 = (value1-2000)*0.91/(3710-2000);
+	valueNorm0 = (value0-2036)*0.298974/(2792-2036);		//17.13 °
+	valueNorm1 = (value1-2162)*0.91/(3880-2162);
 	
 	printk("Resultat Angle (cal): %u\n", value0);
 	printk("Resultat Pos (cal): %u\n", value1);
@@ -94,7 +94,7 @@ void methode_ctrl(int id){ //tâche controleur
 	x[1] = temp[1];
 	x[2] = temp[2];
 	x[3] = temp[3];
-	u = cdc[0]*x[0] + cdc[1]*x[1] + cdc[2]*x[2] + cdc[3]*x[3]; //1.4* = gain yolo
+	u = 0.9*cdc[0]*x[0] + 0.9*cdc[1]*x[1] + 0.9*cdc[2]*x[2] + 0.9*cdc[3]*x[3]; //1.4* = gain yolo
 
 	//printk("Matrice X : [%d, %d, %d, %d]\n", (int)(x[0]*1000), (int)(x[1]*1000), (int)(x[2]*1000), (int)(x[3]*1000));
 
@@ -127,7 +127,7 @@ static int modC_init(void) {
 
   start_rt_timer(nano2count(TICK_PERIOD));
   now = rt_get_time();
-  rt_task_make_periodic(&task_ctrl, now, nano2count(PERIODE_CONTROL));
+  rt_task_make_periodic(&task_ctrl, now, nano2count(PERIODE_CONTROL/2));
  
   printk("Init Module Controleur (C)\n");
  
