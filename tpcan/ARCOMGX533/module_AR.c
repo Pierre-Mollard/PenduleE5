@@ -21,6 +21,8 @@ MODULE_LICENSE("GPL");
 #define NUMERO 1
 #define PRIORITE 1
 
+#define FIFO 1
+
 static RT_TASK task_acq;
 u16 value0, value1;
 
@@ -32,6 +34,11 @@ void methode_acq(int id){ //acquisition
   	SetChanel(0);
   	value0 = ReadAD();
 	//printk("Resultat Angle (0/4096) : %u\n", value0);
+
+	//FIFO
+	char * tampon;
+	tampon = value0;
+	rtf_put(FIFO, tampon, sizeof(char));
 
 	//wait 
 	rt_busy_sleep(nano2count(TICK_PERIOD*5));
@@ -65,6 +72,8 @@ static int modAR_init(void) {
   int ierr;
   RTIME now;
 
+  rtf_create(FIFO, 2000);
+
   //taches
   rt_set_oneshot_mode();
   ierr = rt_task_init(&task_acq, methode_acq, 0, STACK_SIZE, PRIORITE, 1, 0);
@@ -82,6 +91,7 @@ static int modAR_init(void) {
 
 static void modAR_exit(void) {
  stop_rt_timer(); 
+ rtf_destroy(FIFO);
  rt_task_delete(&task_acq);
 
 }
